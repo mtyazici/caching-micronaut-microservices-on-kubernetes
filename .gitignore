@@ -1,0 +1,9 @@
+.DS_Store
+*.txt
+initial/target/*
+final/target/*
+.ipr
+*.iml
+.iws
+.idea/
+target/

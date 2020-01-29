@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hazelcast-micronaut-statefulset
+  labels:
+    app: hazelcast-micronaut
+spec:
+  replicas: 2
+  serviceName: hazelcast-micronaut-service
+  selector:
+    matchLabels:
+      app: hazelcast-micronaut
+  template:
+    metadata:
+      labels:
+        app: hazelcast-micronaut
+    spec:
+      containers:
+        - name: hazelcast-micronaut-container
+          image: caching-micronaut-microservices-on-kubernetes:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 5701
+          - containerPort: 8080
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hazelcast-micronaut-service
+spec:
+  type: NodePort
+  selector:
+    app: hazelcast-micronaut
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 31000
