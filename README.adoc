@@ -1,0 +1,172 @@
+
+:github-address: https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes
+:templates-url: https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master
+:hazelcast: Hazelcast IMDG
+:framework: Quarkus
+
+
+= Getting Started with Hazelcast using Micronaut in Kubernetes
+
+This guide helps you start with Hazelcast in Quarkus based Microservice and deploy into Kubernetes
+
+https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master/link-to-repo.adoc
+
+== What You’ll Learn
+
+In this guide, you will deploy Micronaut application into a Kubernetes cluster. Hazelcast cluster members will automatically discover each other using https://github.com/hazelcast/hazelcast-kubernetes[Hazelcast Kubernetes discovery plugin].
+
+== Prerequisites
+
+-   ~15 minutes
+
+-   Docker (Docker for Desktop is good enough)
+
+-   Kubernetes cluster (Docker for Desktop or Minikube is good enough)
+
+-  JDK 1.8+
+
+-  Apache Maven 3.2+
+
+
+== About Deploying the Application to Kubernetes
+
+We will take the application that we built on https://github.com/hazelcast-guides/hazelcast-embedded-micronaut[Hazelcast Embedded Micronaut] and deploy it on Kubernetes. https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes[Caching Micronaut Microservices on kubernetes] has the updated version of the application.
+
+In `pom.xml` we add the following dependecy for cluster members to find each other in the cluster.
+[source]
+----
+<dependency>
+    <groupId>com.hazelcast</groupId>
+    <artifactId>hazelcast-kubernetes</artifactId>
+    <version>${hazelcast-kubernetes.version}</version>
+</dependency>
+----
+And in the code we change the `HazelcastAdditionalSettings` class as follows:
+
+[source,java]
+----
+@Singleton
+public class HazelcastAdditionalSettings
+        implements BeanCreatedEventListener<HazelcastMemberConfiguration> {
+
+    public HazelcastMemberConfiguration onCreated(BeanCreatedEvent<HazelcastMemberConfiguration> event) {
+        HazelcastMemberConfiguration configuration = event.getBean();
+        configuration.getGroupConfig().setName("micronaut-cluster");
+        JoinConfig joinConfig = configuration.getNetworkConfig().getJoin();
+        joinConfig.getMulticastConfig().setEnabled(false);
+        joinConfig.getKubernetesConfig().setEnabled(true);
+        return configuration;
+    }
+}
+----
+We also create following file to deploy the application into kubernetes.
+
+`kubernetes.yaml` will create two Micronaut applications and a service to connect them to outer world.
+
+
+== Create a Docker Image
+
+
+To create the container (Docker) image of the application, we will use Jib tool. It allows to build containers from Java applications without a Docker file or even changing the pom.xml file. To build the image, you can run the command below:
+[source]
+----
+$ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild
+----
+This command will craete a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`
+
+You can change its name to point to your docker hub repository to be able to push it
+----
+$ docker tag caching-micronaut-microservices-on-kubernetes:0.1.0  YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
+$ docker rmi caching-micronaut-microservices-on-kubernetes:0.1.0
+$ docker push YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
+----
+
+The above command will push the image to your repository in docker hub. If you run above commands make sure to change following part in kubernetes.yaml
+
+[source]
+----
+...
+      containers:
+        - name: hazelcast-micronaut-container
+          image: caching-micronaut-microservices-on-kubernetes:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+....
+----
+
+
+== Configure RBAC
+
+https://github.com/hazelcast/hazelcast-kubernetes[Hazelcast Kubernetes discovery plugin] makes calls to Kubernetes API to provide automatic member discovery. Therefore, it needs to have specific ClusterRole rules granted. You can apply the minimal RBAC configuration (for the `default` service account in the `default` namespace) with the following command.
+
+By this time make sure you have your kubernetes environment running.
+[source,shell script]
+----
+kubectl apply -f rbac.yaml
+----
+
+Note that:
+
+- If you use service account other than `default` or namespace other than `default`, you need to modify `rbac.yaml` file.
+- If your Kubernetes cluster does not use RBAC, you can skip the "Configure RBAC" step
+
+== Deploy Micronaut Application to Kubernetes
+
+[source,shell script]
+----
+kubectl apply -f kubernetes.yaml
+----
+
+== Testing the Application
+Launch a curl container inside kubernetes cluster. This will create an interactable shell.
+
+[source,shell script]
+----
+$ kubectl run curl --rm --image=radial/busyboxplus:curl -i --tty
+----
+
+Put a value to the cluster
+
+[source,shell script]
+----
+$ curl  "http://quarkus-service/hazelcast/put?key=1&value=2"
+{"value":"2","podName":"hazelcast-embedded-hazelcast-micronaut-container-0"}
+----
+
+Get the value from cluster in a loop and see that it is retrieved from different Pod Names.
+
+[source,shell script]
+----
+$ while true; do curl "http://quarkus-service/hazelcast/get?key=1"; sleep 2;echo; done
+{"value":"2","podName":"hazelcast-micronaut-container-1"}
+{"value":"2","podName":"hazelcast-micronaut-container-0"}
+...
+----
+
+You can stop the command by `CTRL + C` and exit the shell by typing `exit`.
+
+== Tearing Down the Application
+To delete all Kubernetes resources you created, run the following commands.
+
+[source,shell script]
+----
+$ kubectl delete -f kubernetes.yaml
+$ kubectl delete -f rbac.yaml
+----
+
+== Summary
+
+In this guide, we bootstrapped a Micronaut application and deployed it to Kubernetes.
+
+== See Also
+
+
+- https://github.com/hazelcast-guides/caching-springboot-microservices-on-kubernetes[Caching SpringBoot Microservices with Hazelcast in Kubernetes]
+- https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes[Caching Micronaut microservices on Kubernetes using Hazelcast]
+- https://github.com/hazelcast-guides/hazelcast-embedded-springboot[Hazelcast Embedded Spring Boot]
+
+
+
+
+
+
