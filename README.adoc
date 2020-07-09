@@ -2,12 +2,12 @@
 :github-address: https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes
 :templates-url: https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master
 :hazelcast: Hazelcast IMDG
-:framework: Quarkus
+:framework: Micronaut
 
 
 = Getting Started with Hazelcast using Micronaut in Kubernetes
 
-This guide helps you start with Hazelcast in Quarkus based Microservice and deploy into Kubernetes
+This guide helps you start with Hazelcast in Micronaut based Microservice and deploy into Kubernetes
 
 https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master/link-to-repo.adoc
 
@@ -59,7 +59,7 @@ public class HazelcastAdditionalSettings
     }
 }
 ----
-We also create following file to deploy the application into kubernetes.
+We also create the following file to deploy the application into kubernetes.
 
 `kubernetes.yaml` will create two Micronaut applications and a service to connect them to outer world.
 
@@ -67,12 +67,12 @@ We also create following file to deploy the application into kubernetes.
 == Create a Docker Image
 
 
-To create the container (Docker) image of the application, we will use Jib tool. It allows to build containers from Java applications without a Docker file or even changing the pom.xml file. To build the image, you can run the command below:
+To create the container (Docker) image of the application, we will use Jib tool. It allows to build containers from Java applications without a Docker file or even changing the `pom.xml` file. To build the image, you can run the command below:
 [source]
 ----
 $ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild
 ----
-This command will craete a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`
+This command will create a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`
 
 You can change its name to point to your docker hub repository to be able to push it
 ----
@@ -156,7 +156,7 @@ $ kubectl delete -f rbac.yaml
 
 == Summary
 
-In this guide, we bootstrapped a Micronaut application and deployed it to Kubernetes.
+In this guide, we bootstrapped a Micronaut application and deployed it to Kubernetes. We pushed a key-value pair to one of the applications. Then we could get the key-value pair from both.
 
 == See Also
 
