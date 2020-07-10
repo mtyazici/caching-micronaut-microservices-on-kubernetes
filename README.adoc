@@ -72,17 +72,13 @@ To create the container (Docker) image of the application, we will use Jib tool.
 ----
 $ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild
 ----
-This command will create a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`
+This command will create a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`. If you want an image with your choice of name to push it to some registry, you can run the following instead:
 
-You can change its name to point to your docker hub repository to be able to push it
 ----
-$ docker tag caching-micronaut-microservices-on-kubernetes:0.1.0  YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
-$ docker rmi caching-micronaut-microservices-on-kubernetes:0.1.0
-$ docker push YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
+$ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild  -Dimage=YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
 ----
 
-The above command will push the image to your repository in docker hub. If you run above commands make sure to change following part in kubernetes.yaml
-
+If you run the above command make sure to change the following part in the `kubernetes.yaml` file.
 [source]
 ----
 ...
