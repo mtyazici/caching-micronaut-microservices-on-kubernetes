@@ -5,7 +5,7 @@
 :framework: Micronaut
 
 
-= Getting Started with Hazelcast using Micronaut in Kubernetes
+= Getting Started with Hazelcast using Micronaut on Kubernetes
 
 This guide helps you start with Hazelcast in Micronaut based microservice and deploy on Kubernetes.
 
@@ -59,9 +59,8 @@ public class HazelcastAdditionalSettings
     }
 }
 ----
-We also create the following file to deploy the application into kubernetes.
 
-`kubernetes.yaml` will create two Micronaut applications and a service to connect them to outer world.
+We also add the `kubernetes.yaml` file which will create two Micronaut applications and a service to connect them to outer world.
 
 
 == Create a Docker Image
@@ -89,6 +88,15 @@ If you run the above command make sure to change the following part in the `kube
           ports:
 ....
 ----
+
+[TIP]
+====
+If you are using `Minikube` you can run the following command before the `mvn clean compile ...` and the docker image will be available to the docker daemon inside the Minikube. Note that this only applies to the shell you run this command.
+[source,bash]
+----
+$ eval $(minikube docker-env)
+----
+====
 
 
 == Configure RBAC
@@ -126,7 +134,7 @@ Put a value to Hazelcast cluster:
 
 [source,shell script]
 ----
-$ curl  "http://quarkus-service/hazelcast/put?key=1&value=2"
+$ curl  "http://hazelcast-micronaut-service:8080/put?key=1&value=2"
 {"value":"2","podName":"hazelcast-embedded-hazelcast-micronaut-container-0"}
 ----
 
@@ -134,9 +142,9 @@ Get the value from cluster in a loop and see that it is retrieved from different
 
 [source,shell script]
 ----
-$ while true; do curl "http://quarkus-service/hazelcast/get?key=1"; sleep 2;echo; done
-{"value":"2","podName":"hazelcast-micronaut-container-1"}
-{"value":"2","podName":"hazelcast-micronaut-container-0"}
+$ while true; do curl "http://hazelcast-micronaut-service:8080/get?key=1"; sleep 2;echo; done
+{"value":"2","podName":"hazelcast-micronaut-statefulset-1"}
+{"value":"2","podName":"hazelcast-micronaut-statefulset-0"}
 ...
 ----
 
