@@ -1,19 +1,19 @@
 
 :github-address: https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes
-:templates-url: https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master
+:templates-url: templates:ROOT:page$/
 :hazelcast: Hazelcast IMDG
 :framework: Micronaut
 
 
 = Getting Started with Hazelcast using Micronaut in Kubernetes
 
-This guide helps you start with Hazelcast in Micronaut based Microservice and deploy into Kubernetes
+This guide helps you start with Hazelcast in Micronaut based microservice and deploy on Kubernetes.
 
-https://raw.githubusercontent.com/hazelcast-guides/adoc-templates/master/link-to-repo.adoc
+include::{templates-url}/link-to-repo.adoc[]
 
 == What You’ll Learn
 
-In this guide, you will deploy Micronaut application into a Kubernetes cluster. Hazelcast cluster members will automatically discover each other using https://github.com/hazelcast/hazelcast-kubernetes[Hazelcast Kubernetes discovery plugin].
+In this guide, you will deploy Micronaut application on a Kubernetes cluster. Hazelcast cluster members will automatically discover each other using https://github.com/hazelcast/hazelcast-kubernetes[Hazelcast Kubernetes discovery plugin].
 
 == Prerequisites
 
@@ -30,10 +30,10 @@ In this guide, you will deploy Micronaut application into a Kubernetes cluster. 
 
 == About Deploying the Application to Kubernetes
 
-We will take the application that we built on https://github.com/hazelcast-guides/hazelcast-embedded-micronaut[Hazelcast Embedded Micronaut] and deploy it on Kubernetes. https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes[Caching Micronaut Microservices on kubernetes] has the updated version of the application.
+We will take the application that we built on xref:hazelcast-embedded-micronaut:ROOT:index.adoc[Hazelcast Embedded Micronaut] and deploy it on Kubernetes.
 
 In `pom.xml` we add the following dependecy for cluster members to find each other in the cluster.
-[source]
+[source, xml]
 ----
 <dependency>
     <groupId>com.hazelcast</groupId>
@@ -41,7 +41,7 @@ In `pom.xml` we add the following dependecy for cluster members to find each oth
     <version>${hazelcast-kubernetes.version}</version>
 </dependency>
 ----
-And in the code we change the `HazelcastAdditionalSettings` class as follows:
+And in the code we change `JoinConfig` in `HazelcastAdditionalSettings.java` to make Hazelcast instances able to discover each other in Kubernetes environment:
 
 [source,java]
 ----
@@ -96,15 +96,16 @@ If you run the above command make sure to change the following part in the `kube
 https://github.com/hazelcast/hazelcast-kubernetes[Hazelcast Kubernetes discovery plugin] makes calls to Kubernetes API to provide automatic member discovery. Therefore, it needs to have specific ClusterRole rules granted. You can apply the minimal RBAC configuration (for the `default` service account in the `default` namespace) with the following command.
 
 By this time make sure you have your kubernetes environment running.
-[source,shell script]
+[source,bash]
 ----
 kubectl apply -f rbac.yaml
 ----
 
-Note that:
-
+[NOTE]
+====
 - If you use service account other than `default` or namespace other than `default`, you need to modify `rbac.yaml` file.
 - If your Kubernetes cluster does not use RBAC, you can skip the "Configure RBAC" step
+====
 
 == Deploy Micronaut Application to Kubernetes
 
@@ -121,7 +122,7 @@ Launch a curl container inside kubernetes cluster. This will create an interacta
 $ kubectl run curl --rm --image=radial/busyboxplus:curl -i --tty
 ----
 
-Put a value to the cluster
+Put a value to Hazelcast cluster:
 
 [source,shell script]
 ----
@@ -157,10 +158,8 @@ In this guide, we bootstrapped a Micronaut application and deployed it to Kubern
 == See Also
 
 
-- https://github.com/hazelcast-guides/caching-springboot-microservices-on-kubernetes[Caching SpringBoot Microservices with Hazelcast in Kubernetes]
-- https://github.com/hazelcast-guides/caching-micronaut-microservices-on-kubernetes[Caching Micronaut microservices on Kubernetes using Hazelcast]
-- https://github.com/hazelcast-guides/hazelcast-embedded-springboot[Hazelcast Embedded Spring Boot]
-
+- xref:hazelcast-embedded-kubernetes:ROOT:index.adoc[SpringBoot Application with Embedded Hazelcast on Kubernetes]
+- xref:hazelcast-embedded-springboot:ROOT:index.adoc[Getting Started with Hazelcast using Spring Boot]
 
 
 
