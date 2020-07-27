@@ -81,13 +81,11 @@ $ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild  -
 If you run the above command make sure to change the following part in the `kubernetes.yaml` file.
 [source, yaml]
 ----
-...
-      containers:
-        - name: hazelcast-micronaut-container
-          image: caching-micronaut-microservices-on-kubernetes:0.1.0
-          imagePullPolicy: IfNotPresent
-          ports:
-....
+containers:
+- name: hazelcast-micronaut-container
+    image: caching-micronaut-microservices-on-kubernetes:0.1.0
+    imagePullPolicy: IfNotPresent
+    ports:
 ----
 
 [TIP]
