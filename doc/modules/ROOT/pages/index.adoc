@@ -67,18 +67,19 @@ We also add the `kubernetes.yaml` file which will create two Micronaut applicati
 
 
 To create the container (Docker) image of the application, we will use Jib tool. It allows to build containers from Java applications without a Docker file or even changing the `pom.xml` file. To build the image, you can run the command below:
-[source]
+[source, shell]
 ----
 $ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild
 ----
 This command will create a docker image named `caching-micronaut-microservices-on-kubernetes:0.1.0`. If you want an image with your choice of name to push it to some registry, you can run the following instead:
 
+[source, shell]
 ----
 $ mvn clean compile com.google.cloud.tools:jib-maven-plugin:1.8.0:dockerBuild  -Dimage=YOUR-NAME/caching-micronaut-microservices-on-kubernetes:0.1.0
 ----
 
 If you run the above command make sure to change the following part in the `kubernetes.yaml` file.
-[source]
+[source, yaml]
 ----
 ...
       containers:
@@ -92,7 +93,7 @@ If you run the above command make sure to change the following part in the `kube
 [TIP]
 ====
 If you are using `Minikube` you can run the following command before the `mvn clean compile ...` and the docker image will be available to the docker daemon inside the Minikube. Note that this only applies to the shell you run this command.
-[source,bash]
+[source, shell]
 ----
 $ eval $(minikube docker-env)
 ----
@@ -117,7 +118,7 @@ kubectl apply -f rbac.yaml
 
 == Deploy Micronaut Application to Kubernetes
 
-[source,shell script]
+[source, shell]
 ----
 kubectl apply -f kubernetes.yaml
 ----
@@ -125,14 +126,14 @@ kubectl apply -f kubernetes.yaml
 == Testing the Application
 Launch a curl container inside kubernetes cluster. This will create an interactable shell.
 
-[source,shell script]
+[source, shell]
 ----
 $ kubectl run curl --rm --image=radial/busyboxplus:curl -i --tty
 ----
 
 Put a value to Hazelcast cluster:
 
-[source,shell script]
+[source, shell]
 ----
 $ curl  "http://hazelcast-micronaut-service:8080/put?key=1&value=2"
 {"value":"2","podName":"hazelcast-embedded-hazelcast-micronaut-container-0"}
@@ -140,7 +141,7 @@ $ curl  "http://hazelcast-micronaut-service:8080/put?key=1&value=2"
 
 Get the value from cluster in a loop and see that it is retrieved from different Pod Names.
 
-[source,shell script]
+[source, shell]
 ----
 $ while true; do curl "http://hazelcast-micronaut-service:8080/get?key=1"; sleep 2;echo; done
 {"value":"2","podName":"hazelcast-micronaut-statefulset-1"}
@@ -153,7 +154,7 @@ You can stop the command by `CTRL + C` and exit the shell by typing `exit`.
 == Tearing Down the Application
 To delete all Kubernetes resources you created, run the following commands.
 
-[source,shell script]
+[source, shell]
 ----
 $ kubectl delete -f kubernetes.yaml
 $ kubectl delete -f rbac.yaml
@@ -168,7 +169,6 @@ In this guide, we bootstrapped a Micronaut application and deployed it to Kubern
 
 - xref:hazelcast-embedded-kubernetes:ROOT:index.adoc[SpringBoot Application with Embedded Hazelcast on Kubernetes]
 - xref:hazelcast-embedded-springboot:ROOT:index.adoc[Getting Started with Hazelcast using Spring Boot]
-
 
 
 
