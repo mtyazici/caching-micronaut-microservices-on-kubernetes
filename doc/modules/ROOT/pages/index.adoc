@@ -128,6 +128,10 @@ Launch a curl container inside kubernetes cluster. This will create an interacta
 $ kubectl run curl --rm --image=radial/busyboxplus:curl -i --tty
 ----
 
+[NOTE]
+====
+The very first request to each application instance will take a bit longer time to respond since the first request causes hazelcast instance to be started.
+====
 Put a value to Hazelcast cluster:
 
 [source, shell]
