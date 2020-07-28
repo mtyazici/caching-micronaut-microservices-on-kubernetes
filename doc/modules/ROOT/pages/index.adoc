@@ -130,7 +130,7 @@ $ kubectl run curl --rm --image=radial/busyboxplus:curl -i --tty
 
 [NOTE]
 ====
-The very first request to each application instance will take a bit longer time to respond since the first request causes hazelcast instance to be started.
+The very first request to each application instance will take a bit longer time to respond since the first request causes Hazelcast instance to be started.
 ====
 Put a value to Hazelcast cluster:
 
@@ -170,7 +170,6 @@ In this guide, we bootstrapped a Micronaut application and deployed it to Kubern
 
 - xref:hazelcast-embedded-kubernetes:ROOT:index.adoc[SpringBoot Application with Embedded Hazelcast on Kubernetes]
 - xref:hazelcast-embedded-springboot:ROOT:index.adoc[Getting Started with Hazelcast using Spring Boot]
-
 
 
 
